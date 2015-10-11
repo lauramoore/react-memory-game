@@ -1,5 +1,13 @@
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var TileConstants = require('../constants/TileConstants');
+var Leap = require('leapjs');
+
+var controller = new Leap.Controller({frameEventName: 'animationFrame'});
+controller.connect();
+
+controller.on('frame', function(_frame){
+    console.log(_frame);
+});
 
 var TileActions = {
 

@@ -6,6 +6,7 @@
   "dependencies": {
     "envify": "^3.0.0",
     "flux": "^2.0.1",
+    "leapjs": "^0.6.4",
     "lodash": "^3.0.1",
     "object-assign": "^2.0.0",
     "react": "^0.12.2",
