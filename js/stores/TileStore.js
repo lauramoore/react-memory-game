@@ -27,7 +27,6 @@ function generateTiles() {
 }
 
 function clickTile(targetId) {
-    console.log(targetId);
     /**
      * Flip the tile
      */
@@ -43,10 +42,17 @@ function resolveTile(x, y) {
     else if (x < .75) { id = [2,6,10,14]; }
     else { id = [3,7,11,15]; }
     
-    if (y > .75 ) { clickTile(id[0]); }
-    else if (y > .50 ) {clickTile(id[1]); }
-    else if (y > .25 ) {clickTile(id[2]); }
-    else { clickTile(id[3]); }
+    var targetTile;
+    if (y > .75 ) { targetTile = _tiles[id[0]]; }
+    else if (y > .50 ) { targetTile = _tiles[id[1]]; }
+    else if (y > .25 ) { targetTile = _tiles[id[2]]; }
+    else { targetTile = _tiles[id[3]]; }
+
+    console.log(targetTile);
+
+    if (! targetTile.flipped) {
+        targetTile.flipped = true;
+    };
 }
 
 function matchCheck() {
@@ -56,13 +62,13 @@ function matchCheck() {
      * Check if there is any matching tile
      */
 
-    for (var id in _tiles) {
+    _tiles.map(function(tile, index){
 
-        if (_tiles[id].flipped === true && _tiles[id].matched === false) {
-            flipped.push(id);
+        if (tile.flipped === true && tile.matched === false) {
+            flipped.push(index);
         }
 
-    }
+    });
 
     if (flipped.length < 2) return;
 
@@ -98,11 +104,11 @@ var TileStore = assign({}, EventEmitter.prototype, {
 
         var firstFlipIndex = null;
 
-        for (var id in _tiles) {
-            if (_tiles[id].flipped === true && _tiles[id].matched === false) {
-                firstFlipIndex = id;
+        _tiles.map(function(tile, index) {
+            if (tile.flipped === true && tile.matched === false) {
+                firstFlipIndex = index;
             }
-        }
+        });
 
         return firstFlipIndex;
     },
@@ -138,7 +144,7 @@ TileStore.dispatchToken = AppDispatcher.register(function (action) {
 
         case TileConstants.TILE_GRAB:
             resolveTile(action.x, action.y);
-            TileStore.emitChange;
+            TileStore.emitChange();
             break;  
         default:
         // no op
