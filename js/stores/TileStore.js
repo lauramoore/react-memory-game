@@ -120,8 +120,11 @@ TileStore.dispatchToken = AppDispatcher.register(function (action) {
         case TileConstants.MATCH_CHECK:
             matchCheck();
             TileStore.emitChange();
-
             break;
+
+        case TileConstants.TILE_GRAB:
+            console.log(action);
+            break;  
         default:
         // no op
     }

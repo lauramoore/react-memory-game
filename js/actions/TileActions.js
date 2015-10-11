@@ -7,15 +7,20 @@ controller.connect();
 
 controller.on('frame', function(_frame){
      if (_frame && _frame.valid) {
-        if (_frame.hands && _frame.hands.length > 0) {
-            fireHandEvent(_frame.hands[0])
+        if (isHandGrabbing(_frame.hands)) {
+            var interactionBox = _frame.interactionBox;
+            var hand = _frame.hands[0];
+            var normalizedHand = interactionBox.normalizePoint(hand.stabilizedPalmPosition, true);
+            TileActions.grabTile(normalizedHand);
         }
      }
 });
 
-function fireHandEvent(hand) {
-    if (! hand || ! hand.valid) return;
-    console.log(hand);
+function isHandGrabbing(handList) {
+    if (!handList || handList.length === 0) return false;
+    var hand = handList[0];
+    if (! hand || ! hand.valid) return false;
+    return hand.grabStrength > .75;
 }
 
 var TileActions = {
@@ -33,6 +38,14 @@ var TileActions = {
     matchCheck: function() {
         AppDispatcher.dispatch({
             actionType: TileConstants.MATCH_CHECK
+        });
+    },
+
+    grabTile: function(normalizedPoint) {
+        AppDispatcher.dispatch({
+           actionType: TileConstants.TILE_GRAB,
+           x: normalizedPoint[0],
+           y: normalizedPoint[1]
         });
     }
 
