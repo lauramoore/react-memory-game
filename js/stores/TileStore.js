@@ -27,12 +27,26 @@ function generateTiles() {
 }
 
 function clickTile(targetId) {
+    console.log(targetId);
     /**
      * Flip the tile
      */
     _tiles[targetId].flipped = true;
 
 
+}
+
+function resolveTile(x, y) {
+    var id;
+    if (x < .25) { id = [0,4,8,12]; }
+    else if (x < .50) { id = [1,5,9,13]; }
+    else if (x < .75) { id = [2,6,10,14]; }
+    else { id = [3,7,11,15]; }
+    
+    if (y > .75 ) { clickTile(id[0]); }
+    else if (y > .50 ) {clickTile(id[1]); }
+    else if (y > .25 ) {clickTile(id[2]); }
+    else { clickTile(id[3]); }
 }
 
 function matchCheck() {
@@ -123,7 +137,8 @@ TileStore.dispatchToken = AppDispatcher.register(function (action) {
             break;
 
         case TileConstants.TILE_GRAB:
-            console.log(action);
+            resolveTile(action.x, action.y);
+            TileStore.emitChange;
             break;  
         default:
         // no op
