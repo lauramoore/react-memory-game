@@ -3,3 +3,4 @@ build
 .log
 *.log
 js/bundle.js
+js/.bundle.js
