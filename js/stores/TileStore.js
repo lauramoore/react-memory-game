@@ -3,11 +3,13 @@ var EventEmitter = require('events').EventEmitter;
 var TileConstants = require('../constants/TileConstants');
 var assign = require('object-assign');
 var _ = require('lodash');
+var TileActions = require('../actions/TileActions');
 
 var CHANGE_EVENT = 'change';
 
 
 var _tiles = [];
+var _selectedTiles = [];
 
 
 function generateTiles() {
@@ -26,36 +28,40 @@ function generateTiles() {
     }
 }
 
-function clickTile(targetId) {
-    /**
-     * Flip the tile
-     */
-    _tiles[targetId].flipped = true;
+function onSelectTile(index) {
+        if (_selectedTiles.length > 2) return;
 
-
+        _selectedTiles.push(index);
+        var tile = _tiles[index];
+        tile.flipped  = true;
+        
+       if (_selectedTiles.length == 2) {
+           setTimeout(function () {
+              TileActions.matchCheck();
+           }, 2000);
+        }
 }
 
 function resolveTile(x, y) {
-    var id;
-    if (x < .25) { id = [0,4,8,12]; }
-    else if (x < .50) { id = [1,5,9,13]; }
-    else if (x < .75) { id = [2,6,10,14]; }
-    else { id = [3,7,11,15]; }
+    var columns;
+    if (x < .25) { columns = [0,4,8,12]; }
+    else if (x < .50) { columns = [1,5,9,13]; }
+    else if (x < .75) { columns = [2,6,10,14]; }
+    else { columns = [3,7,11,15]; }
     
-    var targetTile;
-    if (y > .75 ) { targetTile = _tiles[id[0]]; }
-    else if (y > .50 ) { targetTile = _tiles[id[1]]; }
-    else if (y > .25 ) { targetTile = _tiles[id[2]]; }
-    else { targetTile = _tiles[id[3]]; }
+    var tileIndex;
+    if (y > .75 ) { tileIndex = columns[0]; }
+    else if (y > .50 ) { tileIndex = columns[1]; }
+    else if (y > .25 ) { tileIndex = columns[2]; }
+    else { tileIndex = columns[3]; }
 
-    console.log(targetTile);
+    console.log(_tiles[tileIndex]);
 
-    if (! targetTile.flipped) {
-        targetTile.flipped = true;
-    };
+    onSelectTile(tileIndex);
 }
 
 function matchCheck() {
+    _selectedTiles = [];
     var flipped = [];
 
     /**
@@ -100,17 +106,9 @@ var TileStore = assign({}, EventEmitter.prototype, {
         this.emit(CHANGE_EVENT);
     },
 
-    getFirstFlipIndex: function () {
+    isWaiting: function () {
 
-        var firstFlipIndex = null;
-
-        _tiles.map(function(tile, index) {
-            if (tile.flipped === true && tile.matched === false) {
-                firstFlipIndex = index;
-            }
-        });
-
-        return firstFlipIndex;
+       return _selectedTiles.length == 2;
     },
 
     /**
@@ -133,7 +131,7 @@ TileStore.dispatchToken = AppDispatcher.register(function (action) {
 
     switch (action.actionType) {
         case TileConstants.TILE_CLICK:
-            clickTile(action.id);
+            onSelectTile(action.id);
             TileStore.emitChange();
             break;
 

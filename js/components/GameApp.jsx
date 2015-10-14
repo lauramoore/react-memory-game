@@ -27,19 +27,22 @@ var GameApp = React.createClass({
         TileStore.removeChangeListener(this._onTileChange);
     },
     onTileClick: function (index) {
+        /*
         if(this.state.isWaiting) return;
         if(TileStore.getFirstFlipIndex() !== null) {
             this.setState({
                 isWaiting: true
             });
-        }
+        } */
         TileActions.clickTile(index);
+        /*
         setTimeout(function () {
             TileActions.matchCheck();
             this.setState({
                 isWaiting: false
             });
         }.bind(this), 2000);
+*/
     },
     render: function () {
         // This section should be hidden by default
@@ -53,7 +56,11 @@ var GameApp = React.createClass({
 
         for (var id in allTiles) {
             id = parseInt(id);
-            tiles.push(<Tile key={id} onTileClick={this.onTileClick} id={id} image={allTiles[id].image} flipped={allTiles[id].flipped} />);
+            tiles.push(<Tile key={id} 
+                             onTileClick={this.onTileClick} 
+                             id={id} 
+                             image={allTiles[id].image} 
+                             flipped={allTiles[id].flipped} />);
         }
 
         return (
