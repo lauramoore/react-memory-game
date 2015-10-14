@@ -2,17 +2,29 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var TileConstants = require('../constants/TileConstants');
 var Leap = require('leapjs');
 
-var controller = new Leap.Controller({frameEventName: 'animationFrame'});
+var controller = new Leap.Controller(
+                    {frameEventName: 'animationFrame',
+                     enableGestures: true});
 controller.connect();
 
 controller.on('frame', function(_frame){
      if (_frame && _frame.valid) {
+        var interactionBox = _frame.interactionBox;
         if (isHandGrabbing(_frame.hands)) {
-            var interactionBox = _frame.interactionBox;
             var hand = _frame.hands[0];
             var normalizedHand = interactionBox.normalizePoint(hand.stabilizedPalmPosition, true);
             TileActions.grabTile(normalizedHand);
-        }
+        } else {
+          if(_frame.gestures.length > 0) {
+              _frame.gestures.forEach(function(gesture){
+                 if(gesture.type === "screenTap") {
+                    console.log(gesture);
+                    var normalizedGesture = interactionBox.normalizePoint(gesture.position, true);
+                    TileActions.grabTile(normalizedGesture);
+                 }
+              });
+          }
+       }
      }
 });
 
